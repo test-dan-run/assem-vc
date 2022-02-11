@@ -132,16 +132,22 @@ class Cotatron(pl.LightningModule):
         self.logger.log_learning_rate(lr_scale * self.hp.train.adam.lr, self.global_step)
 
     def train_dataloader(self):
+        print('Loading train data')
         trainset = TextMelDataset(
             self.hp, self.hp.data.train_dir, self.hp.data.train_meta, train=True, norm=False, use_f0s=False)
+
+        print('Completed loading train data')
 
         return DataLoader(trainset, batch_size=self.hp.train.batch_size, shuffle=True,
                         num_workers=self.hp.train.num_workers,
                         collate_fn=text_mel_collate, pin_memory=True, drop_last=True)
 
     def val_dataloader(self):
+        print('Loading val data')
         valset = TextMelDataset(
             self.hp, self.hp.data.val_dir, self.hp.data.val_meta, train=False, norm=False, use_f0s=False)
+
+        print('Completed loading val data')
 
         return DataLoader(valset, batch_size=self.hp.train.batch_size, shuffle=False,
                         num_workers=self.hp.train.num_workers,

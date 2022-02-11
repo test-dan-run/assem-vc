@@ -1,3 +1,9 @@
+from clearml import Task, Dataset, Model
+
+task = Task.init(project_name='voice_conversion', task_name='cotatron_train', output_uri='s3://experiment-logging/storage', task_type='training')
+task.set_base_docker('dleongsh/assem-vc:v1.8.1')
+task.execute_remotely(queue_name='compute', clone=False, exit_process=True)
+
 import os
 import warnings
 warnings.simplefilter("ignore", UserWarning)
@@ -13,9 +19,18 @@ from utils.loggers import TacotronLogger
 
 
 def main(args):
+    # download data
+
     model = Cotatron(args)
 
     hp_global = OmegaConf.load(args.config[0])
+
+    data = Dataset.get(dataset_project=hp_global.data.dataset_project, dataset_name=hp_global.data.dataset_name)
+    dataset_path = data.get_local_copy()
+    hp_global.data.train_dir = dataset_path
+    hp_global.data.val_dir = dataset_path
+    hp_global.data.f0s_list_path = os.path.join(dataset_path, 'f0s.txt')
+
     hp_cota = OmegaConf.load(args.config[1])
 
     hp = OmegaConf.merge(hp_global, hp_cota)

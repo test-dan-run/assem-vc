@@ -1,0 +1,59 @@
+data:
+  lang: 'cmu' # 'eng' to use english grapheme, 'cmu' to use unstressed arpabet(phoneme), 'kor' to use korean grapheme
+  text_cleaners: ['english_cleaners'] # korean_cleaners, english_cleaners, chinese_cleaners
+  dataset_project: 'NSC'
+  dataset_name: 'part1_22k_vc'
+  speakers: ["00162018", "01482059", "06212201", "03972651", "01900000", "10642485", "01940000", "01270000", "05922142", "00660000", "00052005", "05372110", "00450000", "03630000", "02080000", "08250000", "04512790", "02942644", "02450000", "00022002", "02180000", "08812959", "04892834", "02762664", "04902853", "04322650", "03092658", "04622786", "07262325", "07782867", "04712819", "04722820", "04872832", "10582467", "04852829", "14443161", "03802684"]
+  train_dir: '/datasets/nsc/part1/tts/' # root directory of trainset
+  train_meta: 'vc_train_filelist.txt'  # relative path of metadata file from train_dir
+  val_dir: '/datasets/nsc/part1/tts/' # root directory of valset
+  val_meta: 'vc_dev_filelist.txt'  # relative path of metadata file from val_dir
+  f0s_list_path: 'f0s.txt' # preprocessed f0 list
+###########################
+audio:  # WARNING: this can't be changed.
+  n_mel_channels: 80
+  filter_length: 1024
+  hop_length: 256
+  win_length: 1024
+  sampling_rate: 22050
+  mel_fmin: 0.0
+  mel_fmax: 8000.0
+  f0_min: 50
+  f0_max: 880
+  harm_thresh: 0.25
+###########################
+chn:
+  # text encoder
+  encoder: 512
+  # speaker encoder
+  speaker:
+    cnn: [32, 32, 64, 64, 128, 128]
+    token: 256
+  # f0 encoder
+  residual_out: 1
+  prenet_f0: 1
+  # TTS decoder
+  prenet: 256
+  postnet: 512
+  attention_rnn: 512
+  attention: 128
+  decoder_rnn: 512
+  static: 8
+  dynamic: 8
+###########################
+ker:
+  encoder: 5
+  ### DCA ###
+  static: 21
+  dynamic: 21
+  causal: 11
+  alpha: 0.1
+  beta: 0.9
+  ###########
+  postnet: 5
+  prenet_f0: 1
+###########################
+depth:
+  encoder: 3
+  prenet: 2
+  postnet: 5

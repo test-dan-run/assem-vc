@@ -2,7 +2,7 @@
 .idea/
 
 # configuration
-config/*/*.yaml
+# config/*/*.yaml
 !config/*/default.yaml
 
 # f0 information

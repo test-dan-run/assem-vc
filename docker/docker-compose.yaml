@@ -1,0 +1,29 @@
+version: '3.4'
+
+services:
+
+  local:
+    stdin_open: true
+    tty: true
+    image: assem-vc:0.1.0
+    runtime: nvidia
+    environment:
+      NVIDIA_VISIBLE_DEVICES: 0
+    volumes:
+      - /home/daniel/projects/assem-vc:/vc
+      - /home/daniel/datasets:/datasets
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    shm_size: 16gb
+    command: python3 local_train.py
+
+  tensorboard:
+    stdin_open: true
+    tty: true
+    image: small_lid:v0.1.0
+    ports:
+      - 6006:6006
+    volumes:
+      - /home/daniel/projects/small_lid/logs:/logs
+    command: tensorboard --logdir /logs --host 0.0.0.0 --port 6006
