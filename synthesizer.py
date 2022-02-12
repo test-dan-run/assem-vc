@@ -3,7 +3,6 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import pytorch_lightning as pl
 import numpy as np
-from omegaconf import OmegaConf
 
 from cotatron import Cotatron
 from modules import VCDecoder, SpeakerEncoder, F0_Encoder
@@ -14,16 +13,13 @@ class Synthesizer(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
         self.save_hyperparameters()
-        hp_global = OmegaConf.load(hparams.config[0])
-        hp_vc = OmegaConf.load(hparams.config[1])
-        hp = OmegaConf.merge(hp_global, hp_vc)
-        self.hp = hp
+        self.hp = hparams
 
         self.num_speakers = len(self.hp.data.speakers)
         self.cotatron = Cotatron(hparams)
-        self.f0_encoder = F0_Encoder(hp)
-        self.decoder = VCDecoder(hp)
-        self.speaker = SpeakerEncoder(hp)
+        self.f0_encoder = F0_Encoder(self.hp)
+        self.decoder = VCDecoder(self.hp)
+        self.speaker = SpeakerEncoder(self.hp)
 
         self.is_val_first = True
 
@@ -83,27 +79,27 @@ class Synthesizer(pl.LightningModule):
         mel_s_t = self.decoder(ling_s, z_t)
         return mel_s_t, alignment, residual
 
-    def inference_from_z_t(self, text, mel_source, z_t):
-        device = text.device
-        in_len = torch.LongTensor([text.size(1)]).to(device)
-        out_len = torch.LongTensor([mel_source.size(2)]).to(device)
+    # def inference_from_z_t(self, text, mel_source, z_t):
+    #     device = text.device
+    #     in_len = torch.LongTensor([text.size(1)]).to(device)
+    #     out_len = torch.LongTensor([mel_source.size(2)]).to(device)
 
-        z_s_cota = self.cotatron.speaker.inference(mel_source)
+    #     z_s_cota = self.cotatron.speaker.inference(mel_source)
 
-        text_encoding = self.cotatron.encoder.inference(text)
-        z_s_repeated = z_s_cota.unsqueeze(1).expand(-1, text_encoding.size(1), -1)
-        decoder_input = torch.cat((text_encoding, z_s_repeated), dim=2)
-        _, _, alignment = \
-            self.cotatron.decoder(mel_source, decoder_input, in_len, out_len, in_len,
-                                  prenet_dropout=0.5, no_mask=True, tfrate=False)
-        ling_s = torch.bmm(alignment, text_encoding)
-        ling_s = ling_s.transpose(1, 2)
+    #     text_encoding = self.cotatron.encoder.inference(text)
+    #     z_s_repeated = z_s_cota.unsqueeze(1).expand(-1, text_encoding.size(1), -1)
+    #     decoder_input = torch.cat((text_encoding, z_s_repeated), dim=2)
+    #     _, _, alignment = \
+    #         self.cotatron.decoder(mel_source, decoder_input, in_len, out_len, in_len,
+    #                               prenet_dropout=0.5, no_mask=True, tfrate=False)
+    #     ling_s = torch.bmm(alignment, text_encoding)
+    #     ling_s = ling_s.transpose(1, 2)
 
-        residual = self.f0_encoder(f0_padded)
-        ling_s = torch.cat((ling_s, residual), dim=1)
+    #     residual = self.f0_encoder(f0_padded)
+    #     ling_s = torch.cat((ling_s, residual), dim=1)
 
-        mel_s_t = self.decoder(ling_s, z_t)
-        return mel_s_t, alignment, residual
+    #     mel_s_t = self.decoder(ling_s, z_t)
+    #     return mel_s_t, alignment, residual
 
     # masking convolution from GAN-TTS (arXiv:1909.11646)
     def get_cnn_mask(self, lengths):

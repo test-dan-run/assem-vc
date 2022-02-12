@@ -19,22 +19,19 @@ from modules.alignment_loss import GuidedAttentionLoss
 class Cotatron(pl.LightningModule):
     def __init__(self, hparams):
         super().__init__()
-        self.hparams = hparams  # used for pl
-        hp_global = OmegaConf.load(hparams.config[0])
-        hp_cota = OmegaConf.load(hparams.config[1])
-        hp = OmegaConf.merge(hp_global, hp_cota)
-        self.hp = hp
 
-        self.symbols = Language(hp.data.lang, hp.data.text_cleaners).get_symbols()
+        self.hp = hparams
+
+        self.symbols = Language(self.hp.data.lang, self.hp.data.text_cleaners).get_symbols()
         self.symbols = ['"{}"'.format(symbol) for symbol in self.symbols]
-        self.encoder = TextEncoder(hp.chn.encoder, hp.ker.encoder, hp.depth.encoder, len(self.symbols))
-        self.speaker = SpeakerEncoder(hp)
-        self.classifier = SpkClassifier(hp)
-        self.decoder = TTSDecoder(hp)
+        self.encoder = TextEncoder(self.hp.chn.encoder, self.hp.ker.encoder, self.hp.depth.encoder, len(self.symbols))
+        self.speaker = SpeakerEncoder(self.hp)
+        self.classifier = SpkClassifier(self.hp)
+        self.decoder = TTSDecoder(self.hp)
 
         self.is_val_first = True
 
-        self.use_attn_loss = hp.train.use_attn_loss
+        self.use_attn_loss = self.hp.train.use_attn_loss
         if self.use_attn_loss:
             self.attn_loss = GuidedAttentionLoss(20000, 0.25, 1.00025)
         else:

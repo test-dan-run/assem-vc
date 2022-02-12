@@ -63,9 +63,9 @@ def write_assem(filelist: List[str], output_dir: str, split: float = 0.0) -> Non
 
 if __name__ == '__main__':
 
-    NEMO_MANIFEST_PATH = '/datasets/nsc/part1/test/test_manifest.json'
-    OUTPUT_DIR = '/datasets/nsc/part1/test'
-    SPEAKER_LIST_PATH = '/datasets/nsc/part1/test/speaker_list.txt'
+    NEMO_MANIFEST_PATH = '/datasets/nsc/part1/tts_2/manifest.json'
+    OUTPUT_DIR = '/datasets/nsc/part1/tts_2'
+    SPEAKER_LIST_PATH = '/datasets/nsc/part1/tts_2/speaker_list.txt'
 
     nemo_list = load_nemo_manifest(NEMO_MANIFEST_PATH)
     assem_list = convert_nemo_to_assem(nemo_list)

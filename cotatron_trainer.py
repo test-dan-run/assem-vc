@@ -13,12 +13,12 @@ from utils.loggers import TacotronLogger
 
 
 def main(args):
-    model = Cotatron(args)
 
     hp_global = OmegaConf.load(args.config[0])
     hp_cota = OmegaConf.load(args.config[1])
-
     hp = OmegaConf.merge(hp_global, hp_cota)
+
+    model = Cotatron(hp)
 
     save_path = os.path.join(hp.log.chkpt_dir, args.name)
     os.makedirs(save_path, exist_ok=True)

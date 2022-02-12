@@ -21,9 +21,9 @@ services:
   tensorboard:
     stdin_open: true
     tty: true
-    image: small_lid:v0.1.0
+    image: assem-vc:0.1.0
     ports:
       - 6006:6006
     volumes:
-      - /home/daniel/projects/small_lid/logs:/logs
+      - /home/daniel/projects/assem-vc/logs:/logs
     command: tensorboard --logdir /logs --host 0.0.0.0 --port 6006

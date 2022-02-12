@@ -1,4 +1,7 @@
 import os
+import warnings
+warnings.simplefilter("ignore", UserWarning)
+
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import ModelCheckpoint
 from argparse import ArgumentParser
@@ -8,14 +11,13 @@ from utils.utils import get_commit_hash
 from synthesizer import Synthesizer
 from utils.loggers import SynthesizerLogger
 
-
 def main(args):
-    model = Synthesizer(args)
 
     hp_global = OmegaConf.load(args.config[0])
     hp_vc = OmegaConf.load(args.config[1])
 
     hp = OmegaConf.merge(hp_global, hp_vc)
+    model = Synthesizer(hp)
 
     save_path = os.path.join(hp.log.chkpt_dir, args.name)
     os.makedirs(save_path, exist_ok=True)
